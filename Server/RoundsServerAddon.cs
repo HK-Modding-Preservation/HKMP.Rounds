@@ -79,7 +79,9 @@ namespace HKMP.Rounds.Server
 
             serverApi.CommandManager.RegisterCommand(
                 new ReadyCommand(
-                    _roundManager));
+                    _roundManager,
+                    _settings,
+                    serverApi));
 
             serverApi.CommandManager.RegisterCommand(
                 new AutoStartCommand(
@@ -106,6 +108,8 @@ namespace HKMP.Rounds.Server
                 _settings.AutoStart +
                 " RoundSoul=" +
                 _settings.RoundSoul +
+                " ReadyRequiredCount=" +
+                _settings.ReadyRequiredCount +
                 " DisableEnemies=" +
                 _settings.DisableEnemies +
                 " DebugDisableShade=" +

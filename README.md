@@ -2,13 +2,13 @@
 
 ## Chat Commands
 * `/start`, `/round` — **starts a new round**. *Available only for the admin/host.*
-* `/rd`, `/рд`, `/ready` — marks a player as **Ready** (when auto-start is enabled).
+* `/rd`,`/RD`, `/рд`, `/РД`, `/ready` — marks a player as **Ready** (when auto-start is enabled).
 * `/round end` — **manually ends** the current round.
 * `/round wins <number|off>` — sets or disables the **match win target** (value from `1` to `1000`; can only be changed *before* the round starts).
 * `/round mp <0-198>` — changes the **amount of MP (SOUL)** restored at the beginning of a round.
 * `/stats` — displays the current **win statistics** for all players.
 * `/resetstats` — completely **resets win statistics**. *Available only for the admin.*
-
+* `/rd qty <0-1000>` — sets the required number of ready players to start and end a round (0 = all players on the host). *Available only for the administrator.*
 ---
 
 ## Gameplay Features & Phases

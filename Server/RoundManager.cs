@@ -335,9 +335,35 @@ namespace HKMP.Rounds.Server
 
         public bool StartRound()
         {
+            IReadOnlyCollection<IServerPlayer> players =
+                _serverApi.ServerManager.Players;
+
+            if (players == null)
+            {
+                return false;
+            }
+
+            List<ushort> participantIds =
+                new List<ushort>();
+
+            foreach (IServerPlayer player in players)
+            {
+                if (player != null)
+                {
+                    participantIds.Add(player.Id);
+                }
+            }
+
+            return StartRound(participantIds);
+        }
+
+        public bool StartRound(
+            IReadOnlyCollection<ushort> participantIds)
+        {
             if (_roundActive ||
                 _waitingForPreparation ||
-                _network == null)
+                _network == null ||
+                participantIds == null)
             {
                 return false;
             }
@@ -347,6 +373,14 @@ namespace HKMP.Rounds.Server
 
             if (players == null ||
                 players.Count < 2)
+            {
+                return false;
+            }
+
+            HashSet<ushort> requestedParticipantIds =
+                new HashSet<ushort>(participantIds);
+
+            if (requestedParticipantIds.Count < 2)
             {
                 return false;
             }
@@ -361,7 +395,8 @@ namespace HKMP.Rounds.Server
 
             foreach (IServerPlayer player in players)
             {
-                if (player == null)
+                if (player == null ||
+                    !requestedParticipantIds.Contains(player.Id))
                 {
                     continue;
                 }

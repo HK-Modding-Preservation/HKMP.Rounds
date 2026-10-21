@@ -14,12 +14,17 @@ namespace HKMP.Rounds.Settings
             public bool DisableEnemies;
             public bool DebugDisableShade;
             public bool TimerIntegrationEnabled;
+            public int ReadyRequiredCount;
         }
 
         private const int DefaultRoundSoul = 198;
         private const int MaximumRoundSoul = 198;
+        private const int DefaultReadyRequiredCount = 0;
+        private const int MaximumReadyRequiredCount = 1000;
 
         private readonly string _filePath;
+
+        public event Action AutoStartDisabled;
 
         public bool AutoStart
         {
@@ -51,6 +56,12 @@ namespace HKMP.Rounds.Settings
             private set;
         }
 
+        public int ReadyRequiredCount
+        {
+            get;
+            private set;
+        }
+
         public GlobalSettingsStore()
         {
             _filePath =
@@ -66,6 +77,16 @@ namespace HKMP.Rounds.Settings
         {
             AutoStart = enabled;
             Save();
+
+            if (!enabled)
+            {
+                Action handler = AutoStartDisabled;
+
+                if (handler != null)
+                {
+                    handler();
+                }
+            }
         }
 
         public bool SetRoundSoul(
@@ -78,6 +99,20 @@ namespace HKMP.Rounds.Settings
             }
 
             RoundSoul = amount;
+            Save();
+            return true;
+        }
+
+        public bool SetReadyRequiredCount(
+            int count)
+        {
+            if (count < 0 ||
+                count > MaximumReadyRequiredCount)
+            {
+                return false;
+            }
+
+            ReadyRequiredCount = count;
             Save();
             return true;
         }
@@ -110,6 +145,7 @@ namespace HKMP.Rounds.Settings
             DisableEnemies = false;
             DebugDisableShade = false;
             TimerIntegrationEnabled = false;
+            ReadyRequiredCount = DefaultReadyRequiredCount;
 
             try
             {
@@ -139,11 +175,18 @@ namespace HKMP.Rounds.Settings
                 DisableEnemies = data.DisableEnemies;
                 DebugDisableShade = data.DebugDisableShade;
                 TimerIntegrationEnabled = data.TimerIntegrationEnabled;
+                ReadyRequiredCount = data.ReadyRequiredCount;
 
                 if (RoundSoul < 0 ||
                     RoundSoul > MaximumRoundSoul)
                 {
                     RoundSoul = DefaultRoundSoul;
+                }
+
+                if (ReadyRequiredCount < 0 ||
+                    ReadyRequiredCount > MaximumReadyRequiredCount)
+                {
+                    ReadyRequiredCount = DefaultReadyRequiredCount;
                 }
             }
             catch (Exception exception)
@@ -153,6 +196,7 @@ namespace HKMP.Rounds.Settings
                 DisableEnemies = false;
                 DebugDisableShade = false;
                 TimerIntegrationEnabled = false;
+                ReadyRequiredCount = DefaultReadyRequiredCount;
 
                 Modding.Logger.LogError(
                     "[HKMP.Rounds] Failed to load global settings. Exception=" +
@@ -171,7 +215,8 @@ namespace HKMP.Rounds.Settings
                         RoundSoul = RoundSoul,
                         DisableEnemies = DisableEnemies,
                         DebugDisableShade = DebugDisableShade,
-                        TimerIntegrationEnabled = TimerIntegrationEnabled
+                        TimerIntegrationEnabled = TimerIntegrationEnabled,
+                        ReadyRequiredCount = ReadyRequiredCount
                     };
 
                 string json =
